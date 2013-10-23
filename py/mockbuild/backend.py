@@ -43,6 +43,10 @@ class Commands(object):
         if isinstance(self.chroot_setup_cmd, util.basestring):
             # accept strings in addition to other sequence types
             self.chroot_setup_cmd = self.chroot_setup_cmd.split()
+        if config.has_key('pre_existing_opts'):
+            self.pre_existing_opts = config['pre_existing_opts']
+        else:
+            self.pre_existing_opts = []
         self.more_buildreqs = config['more_buildreqs']
         self.cache_alterations = config['cache_alterations']
 
@@ -150,7 +154,7 @@ class Commands(object):
             self.uid_manager.becomeUser(0, 0)
 
             # first, install pre-existing deps and configured additional ones
-            deps = list(self.buildroot.preexisting_deps)
+            deps = self.pre_existing_opts + list(self.buildroot.preexisting_deps)
             for hdr in util.yieldSrpmHeaders(srpms, plainRpmOk=1):
                 # get text buildreqs
                 deps.extend(util.getAddtlReqs(hdr, self.more_buildreqs))
